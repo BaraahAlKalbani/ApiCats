@@ -20,21 +20,20 @@ public class ApiManager {
             // Fetch the cat image from the API
             Request request = new Request.Builder().url(CAT_API).get().build();
             Response response = httpClient.newCall(request).execute();
-
+            // Get the response body and parse it into an array of CatImage objects
             String responseBody = response.body().string();
             CatImage[] catImages = gson.fromJson(responseBody, CatImage[].class);
-
+            // Check if any cat images were returned
             if (catImages.length == 0) {
                 System.err.println("No cat images found in response");
                 return;
             }
-
+            // Create a SaveManager object to save the image to a file
             SaveManager saveManager = new SaveManager();
-            // Create the data directory if it doesn't exist
+            // Create the data directory if it doesn't already exist
             saveManager.createDirectory();
             // Save the cat image to a file
             saveManager.saveImage(catImages);
-
         } catch (IOException e) {
             System.err.println("Error requesting cat image from API: " + e.getMessage());
         } catch (RuntimeException e) {
