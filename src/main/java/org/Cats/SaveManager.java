@@ -45,25 +45,16 @@ public class SaveManager {
     public void saveImage(CatImage[] catImages) {
         try {
             String imageUrl = catImages[0].getUrl();
-            String imageName = catImages[0].getId().toString() + ".jpg";
+            BufferedImage image = ImageIO.read(new URL(imageUrl));
+            byte[] imageData = getImageData(image);
+            byte[] hash = getHash(imageData);
+            String imageName = hash.toString() + ".jpg";
             File imageFile = new File(dataDirectory, imageName);
-
             // check if a cat image with the same name already exists
             if (imageFile.exists()) {
                 System.out.println("A cat image with the same name already exists: " + imageName);
                 return;
             }
-
-            BufferedImage image = ImageIO.read(new URL(imageUrl));
-            byte[] imageData = getImageData(image);
-            byte[] hash = getHash(imageData);
-
-            // check if a cat image with the same hash already exists
-            if (isDuplicate(hash)) {
-                System.out.println("A cat image with the same hash already exists");
-                return;
-            }
-
             ImageIO.write(image, "jpg", imageFile);
             System.out.println("Saved cat image: " + imageName);
         } catch (IOException e) {
@@ -97,32 +88,5 @@ public class SaveManager {
     private byte[] getHash(byte[] data) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         return digest.digest(data);
-    }
-    /**
-     * Checks if a file with the same hash as the provided hash exists in the data directory.
-     * @param hash the hash to check for duplicates.
-     * @return true if a file with the same hash exists, false otherwise.
-     */
-    private boolean isDuplicate(byte[] hash) {
-        File[] files = dataDirectory.listFiles();
-        if (files == null) {
-            return false;
-        }
-        for (File file : files) {
-            if (!file.isDirectory()) {
-                try {
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    byte[] imageData = new byte[(int) file.length()];
-                    fileInputStream.read(imageData);
-                    byte[] fileHash = getHash(imageData);
-                    if (Arrays.equals(hash, fileHash)) {
-                        return true;
-                    }
-                } catch (IOException | NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return false;
     }
 }
