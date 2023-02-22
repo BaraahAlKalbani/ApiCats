@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.UUID;
 
 public class SaveManager {
     private File dataDirectory;
@@ -37,9 +36,9 @@ public class SaveManager {
      */
     public void saveImage(CatImage[] catImages) {
         try {
-            // Extract the image URL and generate a unique image name
+            // Extract the image URL and image name by id
             String imageUrl = catImages[0].getUrl();
-            String imageName = UUID.randomUUID().toString() + ".jpg";
+            String imageName = catImages[0].getId().toString() + ".jpg";
             // Create a new file with the generated name
             File imageFile = new File(dataDirectory, imageName);
             // Check if a file with the same name already exists
