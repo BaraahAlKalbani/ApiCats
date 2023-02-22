@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 public class SaveManager {
     // the directory where the data will be saved
@@ -47,8 +46,7 @@ public class SaveManager {
             String imageUrl = catImages[0].getUrl();
             BufferedImage image = ImageIO.read(new URL(imageUrl));
             byte[] imageData = getImageData(image);
-            byte[] hash = getHash(imageData);
-            String imageName = hash.toString() + ".jpg";
+            String imageName = getHashAsString(imageData) + ".jpg";
             File imageFile = new File(dataDirectory, imageName);
             // check if a cat image with the same name already exists
             if (imageFile.exists()) {
@@ -80,13 +78,18 @@ public class SaveManager {
     }
 
     /**
-     * Gets the hash for a byte array of data.
+     * Gets the hash for a byte array of data as a string.
      * @param data the byte array of data to get the hash for.
-     * @return a byte array containing the hash.
+     * @return a string containing the hash.
      * @throws NoSuchAlgorithmException if the SHA-256 algorithm is not available.
      */
-    private byte[] getHash(byte[] data) throws NoSuchAlgorithmException {
+    private String getHashAsString(byte[] data) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        return digest.digest(data);
+        byte[] hash = digest.digest(data);
+        StringBuilder hashString = new StringBuilder();
+        for (byte b : hash) {
+            hashString.append(String.format("%02x", b));
+        }
+        return hashString.toString();
     }
 }
